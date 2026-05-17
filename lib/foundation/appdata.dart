@@ -202,6 +202,7 @@ class Settings with ChangeNotifier {
     'longPressZoomPosition': "press", // press, center
     'checkUpdateOnStart': false,
     'limitImageWidth': true,
+    'limitImageWidthRatio': 0.7,
     'webdav': [], // empty means not configured
     "disableSyncFields": "", // "field1, field2, ..."
     'dataVersion': 0,

@@ -1025,9 +1025,11 @@ class _ContinuousModeState extends State<_ContinuousMode>
     var width = reader.size.width;
     var height = reader.size.height;
     if (appdata.settings['limitImageWidth'] &&
-        width / height > 0.7 &&
         reader.mode == ReaderMode.continuousTopToBottom) {
-      width = height * 0.7;
+      var ratio = (appdata.settings['limitImageWidthRatio'] ?? 0.7).toDouble();
+      if (width / height > ratio) {
+        width = height * ratio;
+      }
     }
 
     return PhotoView.customChild(

@@ -341,12 +341,35 @@ class _ReaderSettingsState extends State<ReaderSettings> {
           subtitle: 'When using Continuous(Top to Bottom) mode'.tl,
           settingKey: 'limitImageWidth',
           onChanged: () {
+            setState(() {});
             widget.onChanged?.call('limitImageWidth');
           },
           comicId: isEnabledSpecificSettings ? widget.comicId : null,
           comicSource: isEnabledSpecificSettings ? widget.comicSource : null,
           useDeviceSettings: useDeviceSpecificSettings,
         ).toSliver(),
+        if (isEnabledSpecificSettings
+            ? appdata.settings.getReaderSetting(
+                widget.comicId!,
+                widget.comicSource!,
+                'limitImageWidth',
+              )
+            : useDeviceSpecificSettings
+            ? appdata.settings.getDeviceReaderSetting('limitImageWidth')
+            : appdata.settings['limitImageWidth'] == true)
+          _SliderSetting(
+            title: 'Image width ratio'.tl,
+            settingsIndex: 'limitImageWidthRatio',
+            interval: 0.05,
+            min: 0.3,
+            max: 1.0,
+            onChanged: () {
+              widget.onChanged?.call('limitImageWidthRatio');
+            },
+            comicId: isEnabledSpecificSettings ? widget.comicId : null,
+            comicSource: isEnabledSpecificSettings ? widget.comicSource : null,
+            useDeviceSettings: useDeviceSpecificSettings,
+          ).toSliver(),
         if (App.isAndroid)
           _SwitchSetting(
             title: 'Turn page by volume keys'.tl,
