@@ -835,6 +835,18 @@ class _ContinuousModeState extends State<_ContinuousMode>
 
   @override
   Widget build(BuildContext context) {
+    double? constrainWidth;
+    var limitWidthEnabled = appdata.settings['limitImageWidth'] == true &&
+        reader.mode == ReaderMode.continuousTopToBottom;
+    if (limitWidthEnabled) {
+      var r = (appdata.settings['limitImageWidthRatio'] ?? 0.7).toDouble();
+      var w = reader.size.width;
+      var h = reader.size.height;
+      if (w / h > r) {
+        constrainWidth = h * r;
+      }
+    }
+
     Widget widget = ScrollablePositionedList.builder(
       initialScrollIndex: reader.page,
       itemScrollController: itemScrollController,
@@ -873,15 +885,30 @@ class _ContinuousModeState extends State<_ContinuousMode>
 
         return ColoredBox(
           color: context.colorScheme.surface,
-          child: ComicImage(
-            filterQuality: FilterQuality.medium,
-            image: image,
-            width: width,
-            height: height,
-            fit: BoxFit.contain,
-            onInit: (state) => imageStates.add(state),
-            onDispose: (state) => imageStates.remove(state),
-          ),
+          child: constrainWidth != null
+              ? Center(
+                  child: SizedBox(
+                    width: constrainWidth,
+                    child: ComicImage(
+                      filterQuality: FilterQuality.medium,
+                      image: image,
+                      width: double.infinity,
+                      height: height,
+                      fit: BoxFit.contain,
+                      onInit: (state) => imageStates.add(state),
+                      onDispose: (state) => imageStates.remove(state),
+                    ),
+                  ),
+                )
+              : ComicImage(
+                  filterQuality: FilterQuality.medium,
+                  image: image,
+                  width: width,
+                  height: height,
+                  fit: BoxFit.contain,
+                  onInit: (state) => imageStates.add(state),
+                  onDispose: (state) => imageStates.remove(state),
+                ),
         );
       },
       scrollBehavior: const MaterialScrollBehavior().copyWith(
@@ -1024,13 +1051,6 @@ class _ContinuousModeState extends State<_ContinuousMode>
     );
     var width = reader.size.width;
     var height = reader.size.height;
-    if (appdata.settings['limitImageWidth'] &&
-        reader.mode == ReaderMode.continuousTopToBottom) {
-      var ratio = (appdata.settings['limitImageWidthRatio'] ?? 0.7).toDouble();
-      if (width / height > ratio) {
-        width = height * ratio;
-      }
-    }
 
     return PhotoView.customChild(
       backgroundDecoration: BoxDecoration(color: context.colorScheme.surface),
