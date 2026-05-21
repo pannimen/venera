@@ -401,6 +401,22 @@ class _ReaderSettingsState extends State<ReaderSettings> {
           comicSource: isEnabledSpecificSettings ? widget.comicSource : null,
           useDeviceSettings: useDeviceSpecificSettings,
         ).toSliver(),
+        if (App.isIOS)
+          SelectSetting(
+            title: "Back swipe mode".tl,
+            settingKey: "backSwipeMode",
+            optionTranslation: {
+              "any": "Anywhere".tl,
+              "edge": "Edge".tl,
+              "off": "Off".tl,
+            },
+            onChanged: () {
+              widget.onChanged?.call("backSwipeMode");
+            },
+            comicId: isEnabledSpecificSettings ? widget.comicId : null,
+            comicSource: isEnabledSpecificSettings ? widget.comicSource : null,
+            useDeviceSettings: useDeviceSpecificSettings,
+          ).toSliver(),
         SelectSetting(
           title: "Quick collect image".tl,
           settingKey: "quickCollectImage",

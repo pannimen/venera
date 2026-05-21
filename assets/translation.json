@@ -440,7 +440,11 @@
     "Clear specific reader settings for this device": "清除该设备的特殊阅读设置",
     "Enable device specific settings": "启用此设备特定设置",
     "Ignore Certificate Errors": "忽略证书错误",
-    "Mouse scroll speed": "鼠标滚动速度"
+    "Mouse scroll speed": "鼠标滚动速度",
+    "Back swipe mode": "返回滑动手势",
+    "Anywhere": "任意位置",
+    "Edge": "边缘",
+    "Off": "关闭"
   },
   "zh_TW": {
     "Home": "首頁",
@@ -883,6 +887,10 @@
     "Clear specific reader settings for this device": "清除該裝置的特殊閱讀設定",
     "Enable device specific settings": "啟用此裝置特定設定",
     "Ignore Certificate Errors": "忽略證書錯誤",
-    "Mouse scroll speed": "滑鼠滾動速度"
+    "Mouse scroll speed": "滑鼠滾動速度",
+    "Back swipe mode": "返回滑動手勢",
+    "Anywhere": "任意位置",
+    "Edge": "邊緣",
+    "Off": "關閉"
   }
 }

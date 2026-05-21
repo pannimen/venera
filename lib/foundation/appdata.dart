@@ -238,6 +238,7 @@ class Settings with ChangeNotifier {
     'showChapterComments': true, // show chapter comments in reader
     'showChapterCommentsAtEnd':
         false, // show chapter comments at end of chapter
+    'backSwipeMode': 'any', // any, edge, off
   };
 
   operator [](String key) {

@@ -2,8 +2,8 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:venera/foundation/app.dart';
+import 'package:venera/foundation/appdata.dart';
 
 const double _kBackGestureWidth = 20.0;
 const int _kMaxDroppedSwipePageForwardAnimationTime = 800;
@@ -231,7 +231,6 @@ class _IOSBackGestureDetectorState extends State<IOSBackGestureDetector> {
     _recognizer = _BackSwipeRecognizer(
       debugOwner: this,
       gestureWidth: widget.gestureWidth,
-      isPointerInHorizontal: _isPointerInHorizontalScrollable,
       onStart: _handleDragStart,
       onUpdate: _handleDragUpdate,
       onEnd: _handleDragEnd,
@@ -259,42 +258,6 @@ class _IOSBackGestureDetectorState extends State<IOSBackGestureDetector> {
       },
       child: widget.child,
     );
-  }
-
-  bool _isPointerInHorizontalScrollable(Offset globalPosition) {
-    final HitTestResult result = HitTestResult();
-    final binding = WidgetsBinding.instance;
-    binding.hitTestInView(result, globalPosition, binding.platformDispatcher.implicitView!.viewId);
-
-    for (final entry in result.path) {
-      final target = entry.target;
-      if (target is RenderViewport) {
-        if (target.axisDirection == AxisDirection.left || 
-            target.axisDirection == AxisDirection.right) {
-          return true;
-        }
-      } 
-      else if (target is RenderSliver) {
-         if (target.constraints.axisDirection == AxisDirection.left || 
-             target.constraints.axisDirection == AxisDirection.right) {
-          return true;
-        }
-      }
-      else if (target.runtimeType.toString() == '_RenderSingleChildViewport') {
-        try {
-          final dynamic renderObject = target;
-          if (renderObject.axis == Axis.horizontal) {
-            return true;
-          }
-        } catch (e) {
-          // protected
-        }
-      }
-      else if (target is RenderEditable) {
-         return true;
-      }
-    }
-    return false;
   }
 
   void _handleDragStart(DragStartDetails details) {
@@ -336,7 +299,6 @@ class _IOSBackGestureDetectorState extends State<IOSBackGestureDetector> {
 
 class _BackSwipeRecognizer extends OneSequenceGestureRecognizer {
   _BackSwipeRecognizer({
-    required this.isPointerInHorizontal,
     required this.gestureWidth,
     required this.onStart,
     required this.onUpdate,
@@ -345,7 +307,6 @@ class _BackSwipeRecognizer extends OneSequenceGestureRecognizer {
     super.debugOwner,
   });
 
-  final bool Function(Offset globalPosition) isPointerInHorizontal;
   double gestureWidth;
   final ValueSetter<DragStartDetails> onStart;
   final ValueSetter<DragUpdateDetails> onUpdate;
@@ -354,7 +315,6 @@ class _BackSwipeRecognizer extends OneSequenceGestureRecognizer {
 
   Offset? _startGlobal;
   bool _accepted = false;
-  bool _startedInHorizontal = false;
   bool _startedNearLeftEdge = false; 
 
   VelocityTracker? _velocityTracker;
@@ -367,7 +327,6 @@ class _BackSwipeRecognizer extends OneSequenceGestureRecognizer {
     _startGlobal = event.position;
     _accepted = false;
     
-    _startedInHorizontal = isPointerInHorizontal(event.position);
     _startedNearLeftEdge = event.position.dx <= gestureWidth;
 
     _velocityTracker = VelocityTracker.withKind(event.kind);
@@ -391,7 +350,12 @@ class _BackSwipeRecognizer extends OneSequenceGestureRecognizer {
 
         final isRight = dx > 0;
         final isHorizontal = dx.abs() > dy * 1.5;
-        final bool eligible = _startedNearLeftEdge || (!_startedInHorizontal);
+        final mode = appdata.settings['backSwipeMode'] as String? ?? 'any';
+        final bool eligible = switch (mode) {
+          'off' => false,
+          'edge' => _startedNearLeftEdge,
+          _ => true, // 'any'
+        };
 
         if (isRight && isHorizontal && eligible) {
           _accepted = true;
@@ -438,7 +402,6 @@ class _BackSwipeRecognizer extends OneSequenceGestureRecognizer {
     stopTrackingPointer(0);
     _accepted = false;
     _startGlobal = null;
-    _startedInHorizontal = false;
     _startedNearLeftEdge = false;
     _velocityTracker = null;
   }
